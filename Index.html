@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Happy Birthday Bhaisab</title>
+
+  <!-- Balloon-like font -->
+  <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg1:#ffecd2;
+      --bg2:#fcb69f;
+      --accent:#ff6b6b;
+    }
+    html,body{height:100%;margin:0;font-family: "Segoe UI", Roboto, Arial, sans-serif;background:#111;overflow:hidden;}
+    body{
+      background: linear-gradient(120deg,var(--bg1),var(--bg2));
+      transition:background 1s ease;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    /* animated colorful background (activated after OK) */
+    body.party { animation: bgShift 12s linear infinite; }
+    @keyframes bgShift{
+      0%{background: linear-gradient(120deg,#ffecd2,#fcb69f);}
+      25%{background: linear-gradient(120deg,#184894,#c2e9fb);}
+      50%{background: linear-gradient(120deg,#c71193,#b17a14);}
+      75%{background: linear-gradient(120deg,#b2d859,#96e6a1);}
+      100%{background: linear-gradient(120deg,#ffecd2,#fcb69f);}
+    }
+
+    /* stage for confetti and balloons */
+    #stage{ position:fixed; inset:0; pointer-events:none; z-index:700; }
+    #confettiCanvas{ position:fixed; inset:0; pointer-events:none; z-index:710; }
+
+    /* colourful birthday headline */
+    .birthday-headline {
+      width: 100vw;
+      text-align: center;
+      position: fixed;
+      top: 22px;
+      left: 0;
+      z-index: 1400;
+      font-family: 'Luckiest Guy', cursive;
+      font-size: 46px;
+      letter-spacing: 1.5px;
+      /* Gradient text styles */
+      background: linear-gradient(90deg, #ff6b6b, #ffd36e, #66e2ff, #8aff80, #b885ff, #FF6B6B);
+      background-size: 200% auto;
+      animation: shinyText 6s linear infinite;
+      color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-stroke: 2px rgba(0,0,0,0.14);
+      text-shadow: 0 6px 32px #fff3, 0 3px 15px #0004;
+      margin: 0;
+      padding: 0 10px;
+      user-select: none;
+      pointer-events: none;
+    }
+    @keyframes shinyText {
+      0%   { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+    @media (max-width:650px){
+      .birthday-headline { font-size: 28px; top: 10px;}
+    }
+
+    /* modal popup */
+    .modal {
+      position:fixed; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      background: rgba(0,0,0,0.55); z-index:1000;
+    }
+    .card {
+      width:min(720px,92%); max-width:720px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.95));
+      border-radius:18px; padding:26px; box-shadow:0 20px 60px rgba(0,0,0,0.45);
+      text-align:center; animation: floatIn .7s cubic-bezier(.2,.9,.3,1);
+    }
+    @keyframes floatIn{ from{opacity:0;transform:translateY(18px) scale(.98)} to{opacity:1;transform:none} }
+
+    .balloon-title{
+      font-family:'Luckiest Guy',cursive;
+      font-size:44px;
+      background: linear-gradient(90deg,#ff9ab3,#ffd36e,#82e5ff);
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+      text-shadow:0 10px 30px rgba(0,0,0,0.35);
+      -webkit-text-stroke:1px rgba(0,0,0,0.18);
+      display:inline-block; padding:8px 16px; border-radius:14px;
+    }
+    .subtitle{ color:#444; margin:12px 0 18px; }
+
+    .btn-primary{
+      background:linear-gradient(180deg,#ff8aa3,#ff4b4b);
+      color:white;border:0;padding:12px 28px;border-radius:14px;
+      font-size:18px;cursor:pointer;box-shadow:0 10px 30px rgba(255,75,75,0.28);
+    }
+    .btn-primary:hover{ transform:translateY(-3px); }
+
+    /* layout: center slideshow, right-side column for everything else */
+    .layout {
+      width:92vw; max-width:1200px; height:80vh; max-height:820px;
+      display:flex; gap:28px; align-items:center; justify-content:center;
+      z-index:720; pointer-events:auto;
+    }
+
+    /* central slideshow */
+    .center-area {
+      flex:1 1 0;
+      display:flex; align-items:center; justify-content:center;
+      flex-direction:column;
+      min-width:520px;
+    }
+    .slideshow {
+      width:720px; max-width:92vw; height:460px; max-height:68vh;
+      border-radius:16px; overflow:hidden;
+      background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+      box-shadow:0 18px 46px rgba(0,0,0,0.2); display:flex; flex-direction:column; align-items:center; justify-content:center;
+    }
+    .slideshow .title{
+      margin-top:14px; font-family:'Luckiest Guy',cursive; font-size:30px;
+      background: linear-gradient(90deg,#ffd36e,#ff8aa3,#82e5ff);
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+      text-shadow:0 8px 26px rgba(0,0,0,0.28);
+    }
+    #MainArea{ width:86%; height:68%; margin-top:8px; border-radius:12px; overflow:hidden; display:flex; align-items:center; justify-content:center; background:#0003; }
+    #MainArea img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+    .slideshow-controls{ margin-top:14px; display:flex; gap:12px; align-items:center; }
+    .btn-slideshow{ background:linear-gradient(180deg,#ffffff,#f0f0f8); border-radius:12px; padding:10px 16px; border:0; cursor:pointer; font-weight:700; box-shadow:0 8px 22px rgba(0,0,0,0.12); }
+
+    /* side column: instrument, music control, small info */
+    .side-col {
+      width:320px; min-width:220px; display:flex; flex-direction:column; gap:18px; align-items:center;
+    }
+    .side-card{
+      width:100%; border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:12px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); box-shadow:0 12px 36px rgba(0,0,0,0.12);
+      align-items:center;
+    }
+    .instrument-svg{ width:170px; height:170px; cursor:pointer; filter: drop-shadow(0 12px 28px rgba(0,0,0,0.22)); transition:transform .28s; }
+    .instrument-svg:active{ transform:scale(1.04); }
+
+    .instrument-label{ color:#fff; font-weight:700; text-shadow:0 6px 18px rgba(0,0,0,0.28); text-align:center; }
+    .audio-control{ display:flex; gap:10px; align-items:center; justify-content:center; width:100%; }
+
+    .playbtn{ background:linear-gradient(180deg,#ff8aa3,#ff4b4b); color:white; border:0; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:700; box-shadow:0 8px 22px rgba(255,75,75,0.18); }
+    .vol{ width:120px; }
+
+    /* responsive: collapse side under center on small screens */
+    @media (max-width:980px){
+      .layout{ flex-direction:column; align-items:center; height:auto; gap:18px; padding:18px 0; }
+      .side-col{ width:94vw; max-width:720px; order:2; }
+      .center-area{ order:1; }
+      .slideshow{ width:94vw; max-width:720px; }
+      .instrument-svg{ width:140px; height:140px; }
+    }
+    @media (max-width:520px){
+      .balloon-title{ font-size:30px; }
+      .slideshow .title{ font-size:20px; }
+      .slideshow-controls{ flex-wrap:wrap; gap:8px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Colourful birthday headline at top center -->
+  <div class="birthday-headline">
+    Happy Birthday To You! Now You are 50 years old
+  </div>
+
+  <div id="stage" aria-hidden="true"></div>
+  <canvas id="confettiCanvas"></canvas>
+
+  <!-- Modal shown on open -->
+  <div id="birthdayModal" class="modal" role="dialog" aria-modal="true">
+    <div class="card" role="document">
+      <div class="balloon-title">Happy Birthday To You!</div>
+      <p class="subtitle">Wishing you a day full of color, joy and lovely memories 🎉</p>
+      <button id="okBtn" class="btn-primary" aria-label="Celebrate">🎉 Let's Celebrate</button>
+    </div>
+  </div>
+
+  <!-- floating header -->
+  <div class="floating-header" id="floatingHeader" aria-hidden="true">
+    
+  </div>
+
+  <!-- Main layout: center slideshow, right-side column with instrument & controls -->
+  <div class="layout" role="main" aria-live="polite">
+    <div class="center-area" aria-label="Main slideshow area">
+      <div class="slideshow" role="region" aria-label="Photo slideshow">
+        <div class="title">Photo Slideshow</div>
+        <div id="MainArea" aria-hidden="false">
+          <img id="ImgManipulator" src="" alt="slideshow photo">
+        </div>
+        <div class="slideshow-controls" role="toolbar" aria-label="slideshow controls">
+          <button id="slideToggleBtn" class="btn-slideshow">Begin Slide Show</button>
+          <button id="prevBtn" class="btn-slideshow">◀ Prev</button>
+          <button id="nextBtn" class="btn-slideshow">Next ▶</button>
+        </div>
+      </div>
+    </div>
+
+    <aside class="side-col" aria-label="Side instruments and controls">
+      <div class="side-card" role="region" aria-label="Instrument area">
+        <svg class="instrument-svg" id="instrumentSvg" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <g transform="translate(0,0)">
+            <path d="M448 64c0-35.35-28.65-64-64-64-11.02 0-21.42 2.89-30.58 7.94L96 160v64L353.42 480.06C362.58 485.11 372.98 488 384 488c35.35 0 64-28.65 64-64V128c0-35.35-28.65-64-64-64z" fill="#FFD166"/>
+            <path d="M64 192c0 35.35 28.65 64 64 64h80l160 160 32-32V192H64z" fill="#FF6B6B" opacity="0.9"/>
+            <circle cx="420" cy="92" r="20" fill="#FFF6D1" opacity="0.9"/>
+            <circle cx="420" cy="132" r="14" fill="#FFF6D1" opacity="0.8"/>
+          </g>
+        </svg>
+        <div class="instrument-label">Tap the instrument for a burst</div>
+
+        <div class="side-card" style="width:100%; padding:12px;">
+          <div style="font-weight:700; color:#fff; text-align:center; margin-bottom:8px;">Music Controls</div>
+          <div class="audio-control" role="group" aria-label="music controls">
+            <button id="playMusic" class="playbtn">Play</button>
+            <input id="volume" class="vol" type="range" min="0" max="1" step="0.01" value="0.85" aria-label="volume">
+          </div>
+        </div>
+      </div>
+
+      <div class="side-card" style="margin-top:6px;">
+        <div style="font-weight:700;color:#fff;margin-bottom:8px;">Enjoy the celebration!</div>
+        <div style="font-size:13px;color:#ddd; text-align:center; opacity:0.92;">Click balloons to pop, tap the instrument for bursts, and control music on the right.</div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    // ---------- Setup & state ----------
+    const stage = document.getElementById('stage');
+    const canvas = document.getElementById('confettiCanvas');
+    const ctx = canvas.getContext('2d');
+    const modal = document.getElementById('birthdayModal');
+    const okBtn = document.getElementById('okBtn');
+    const floatingHeader = document.getElementById('floatingHeader');
+    const instrumentSvg = document.getElementById('instrumentSvg');
+    const playMusicBtn = document.getElementById('playMusic');
+    const volumeEl = document.getElementById('volume');
+
+    const slideToggleBtn = document.getElementById('slideToggleBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const imgEl = document.getElementById('ImgManipulator');
+
+    let confettiParticles = [];
+    let confettiLoopRunning = false;
+    let audioCtx = null;
+    let balloonSpawnInterval = null;
+    const activeBalloons = new Set();
+    let slideInterval = null;
+    let slideshowRunning = false;
+    let musicPlaying = false;
+    let musicLoopActive = false;
+
+    // birthday-themed slideshow images (no food)
+    const slideshowImages = [
+      "What1.jpeg",
+      "What2.jpeg",
+      "What3.jpeg",
+      "What4.jpeg",
+      "https://wallpapers.com/images/hd/high-resolution-happy-birthday-background-v9jw8zpjme2al5cu.jpg",
+      "https://tse1.explicit.bing.net/th/id/OIP.04lupg4FuCR7Jmuq-0YLAwAAAA?w=470&h=626&rs=1&pid=ImgDetMain&o=7&rm=3",
+      "https://funkylife.in/wp-content/uploads/2021/11/happy-birthday-images-46-1536x1536.jpg",
+      "https://static.vecteezy.com/system/resources/previews/023/635/440/non_2x/happy-birthday-background-illustration-ai-generative-free-photo.jpg"
+    ];
+    const preloaded = slideshowImages.map(src => { const i = new Image(); i.src = src; return i; });
+
+    // canvas sizing
+    function resizeCanvas(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // ---------- Audio primitives ----------
+    const noteFreq = {
+      'C4':261.63,'D4':293.66,'E4':329.63,'F4':349.23,'G4':392.00,'A4':440.00,'B4':493.88,
+      'C5':523.25,'D5':587.33,'E5':659.25,'F5':698.46,'G5':783.99
+    };
+    const notesSequence = [
+      ['G4', .4], ['G4', .4], ['A4', .8], ['G4', .8], ['C5', .8], ['B4', 1.2],
+      ['G4', .4], ['G4', .4], ['A4', .8], ['G4', .8], ['D5', .8], ['C5', 1.2],
+      ['G4', .4], ['G4', .4], ['G5', .8], ['E5', .8], ['C5', .8], ['B4', .8], ['A4', 1.2],
+      ['F5', .4], ['F5', .4], ['E5', .8], ['C5', .8], ['D5', .8], ['C5', 1.2]
+    ];
+
+    function ensureAudioCtx(){
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    function playVariant(variant = 0) {
+      ensureAudioCtx();
+      const now = audioCtx.currentTime;
+      let t = now + 0.05;
+      const master = audioCtx.createGain();
+      master.connect(audioCtx.destination);
+      master.gain.setValueAtTime(0.0001, now);
+      master.gain.linearRampToValueAtTime(volumeEl ? parseFloat(volumeEl.value) : 0.8, now + 0.05);
+
+      notesSequence.forEach(([n, dur], idx) => {
+        const freq = noteFreq[n] || 440;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = variant === 0 ? 'sine' : 'square';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0, t);
+        gain.gain.linearRampToValueAtTime(0.16, t + 0.01);
+        gain.gain.linearRampToValueAtTime(0.0, t + dur - 0.02);
+        osc.connect(gain);
+        gain.connect(master);
+        osc.start(t);
+        osc.stop(t + dur);
+
+        // secondary oscillator for body
+        const osc2 = audioCtx.createOscillator();
+        const gain2 = audioCtx.createGain();
+        osc2.type = variant === 0 ? 'triangle' : 'sine';
+        osc2.frequency.value = freq * (variant === 0 ? 0.5 : 1.5);
+        gain2.gain.setValueAtTime(0, t);
+        gain2.gain.linearRampToValueAtTime(0.06, t + 0.01);
+        gain2.gain.linearRampToValueAtTime(0.0, t + dur - 0.02);
+        osc2.connect(gain2);
+        gain2.connect(master);
+        osc2.start(t);
+        osc2.stop(t + dur);
+
+        t += dur;
+      });
+
+      const totalMs = Math.round((t - now) * 1000);
+      return new Promise(resolve => {
+        setTimeout(() => {
+          master.gain.linearRampToValueAtTime(0.0, audioCtx.currentTime + 0.05);
+          resolve(totalMs);
+        }, totalMs + 40);
+      });
+    }
+
+    // music loop: alternate variants indefinitely when musicPlaying true
+    async function musicLoop(){
+      if (musicLoopActive) return;
+      musicLoopActive = true;
+      let variant = 0;
+      while (musicLoopActive) {
+        if (!musicPlaying) {
+          await new Promise(r => setTimeout(r, 300));
+          continue;
+        }
+        try { await playVariant(variant); } catch(e){}
+        variant = (variant + 1) % 2;
+      }
+      musicLoopActive = false;
+    }
+    function stopMusicLoop(){ musicLoopActive = false; musicPlaying = false; }
+
+    // play button
+    playMusicBtn.addEventListener('click', () => {
+      ensureAudioCtx();
+      musicPlaying = !musicPlaying;
+      playMusicBtn.textContent = musicPlaying ? 'Pause' : 'Play';
+      if (musicPlaying) musicLoop().catch(()=>{});
+    });
+
+    // volume slider visual effect
+    volumeEl.addEventListener('input', () => {
+      const v = parseFloat(volumeEl.value);
+      instrumentSvg.style.filter = `drop-shadow(0 10px ${8 + v*20}px rgba(0,0,0,0.22))`;
+    });
+
+    // ---------- Balloons ----------
+    const balloonColors = [
+      ['#FF5C8A','#FF9DC5'],
+      ['#6AD7FF','#7AE7FF'],
+      ['#FFD36E','#FFC77B'],
+      ['#B9FFB6','#77E08A'],
+      ['#C2B3FF','#A79AFF']
+    ];
+
+    function createBalloon(xPercent) {
+      if (activeBalloons.size > 80) return null;
+      const el = document.createElement('div');
+      el.className = 'balloon';
+      const idx = Math.floor(Math.random() * balloonColors.length);
+      const [c1,c2] = balloonColors[idx];
+      el.style.background = `radial-gradient(circle at 30% 25%, rgba(255,255,255,0.68) 0%, rgba(255,255,255,0) 40%), linear-gradient(180deg, ${c1}, ${c2})`;
+      const size = Math.floor(Math.random()*28) + 70;
+      el.style.width = size + 'px';
+      el.style.height = Math.floor(size*1.25) + 'px';
+      const left = (xPercent !== undefined) ? xPercent : Math.random() * 86 + 7;
+      el.style.left = left + '%';
+      const duration = (Math.random() * 14 + 10).toFixed(1);
+      el.style.animation = `floatUp ${duration}s linear`;
+      el.style.pointerEvents = 'auto';
+      el.style.zIndex = 720 + Math.floor(Math.random()*50);
+
+      const s = document.createElement('div'); s.className = 'string'; el.appendChild(s);
+
+      el.addEventListener('click', () => popBalloon(el));
+      el.addEventListener('animationend', () => popBalloon(el));
+
+      stage.appendChild(el);
+      activeBalloons.add(el);
+
+      el.animate([
+        { transform: 'translateY(0) rotate(0deg)' },
+        { transform: 'translateY(0) rotate(6deg)' },
+        { transform: 'translateY(0) rotate(-6deg)' },
+        { transform: 'translateY(0) rotate(0deg)' }
+      ], { duration: 3000 + Math.random()*3000, iterations: Infinity });
+
+      el._cleanup = setTimeout(() => { try{ if (el.parentElement) el.remove(); }catch(e){} activeBalloons.delete(el); }, (parseFloat(duration) + 3.0) * 1000);
+
+      return el;
+    }
+
+    function popBalloon(el) {
+      if (!el || el.dataset.popped) return;
+      el.dataset.popped = '1';
+      el.classList.add('popping');
+      const rect = el.getBoundingClientRect();
+      createPartyBurst(rect.left + rect.width/2, rect.top + rect.height/3, 22);
+      setTimeout(() => { try{ el.remove(); } catch(e){} activeBalloons.delete(el); if (el._cleanup) clearTimeout(el._cleanup); }, 420);
+    }
+
+    function spawnBalloonsBurst(count=18, stagger=true) {
+      let created = 0;
+      const sp = setInterval(() => {
+        if (created >= count) { clearInterval(sp); return; }
+        createBalloon(Math.random()*86 + 7);
+        created++;
+      }, stagger ? 180 : 1);
+      return sp;
+    }
+
+    function startBalloonSpawner() {
+      if (balloonSpawnInterval) return;
+      spawnBalloonsBurst(22, true);
+      balloonSpawnInterval = setInterval(() => {
+        if (Math.random() > 0.6) createBalloon(Math.random()*86 + 7);
+        if (Math.random() > 0.98) spawnBalloonsBurst(4, true);
+      }, 700);
+    }
+    function stopBalloonSpawner(){ if (balloonSpawnInterval){ clearInterval(balloonSpawnInterval); balloonSpawnInterval = null; } }
+
+    // ---------- Confetti ----------
+    function startConfetti() {
+      if (confettiLoopRunning) return;
+      confettiLoopRunning = true;
+      const colors = ['#FF6B6B','#FFD166','#6CE7B8','#78D5FF','#C2B3FF','#FF8AC2','#FFFFFF'];
+      const W = canvas.width, H = canvas.height;
+      const count = Math.floor(Math.min(420, (W*H)/3200));
+      confettiParticles = [];
+      for (let i=0;i<count;i++){
+        confettiParticles.push({ x: Math.random()*W, y: Math.random()*H - H, r: (Math.random()*8)+6, tilt: Math.random()*10, color: colors[Math.floor(Math.random()*colors.length)], velY: 1 + Math.random()*5, velX: -2 + Math.random()*4, rot: Math.random()*360 });
+      }
+      let lastTime = performance.now();
+      (function loop(){
+        if (!confettiLoopRunning) return;
+        const now = performance.now();
+        const dt = (now - lastTime) / 16.67;
+        lastTime = now;
+        const Wc = canvas.width, Hc = canvas.height;
+        ctx.clearRect(0,0,Wc,Hc);
+        for (let p of confettiParticles){
+          p.x += p.velX * dt; p.y += p.velY * dt; p.tilt += 0.4 * dt; p.rot += (p.velX * 0.8) * dt;
+          ctx.save();
+          ctx.translate(p.x + Math.sin(p.tilt/8)*6, p.y);
+          ctx.rotate(p.rot * Math.PI/180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.r/2, -p.r/2, p.r, p.r*0.6);
+          ctx.restore();
+          if (p.y > Hc + 60 || p.x < -80 || p.x > Wc + 80){
+            p.x = Math.random()*Wc; p.y = -20 - (Math.random()*Hc*0.3); p.velY = 1 + Math.random()*5; p.velX = -2 + Math.random()*4; p.rot = Math.random()*360;
+          }
+        }
+        requestAnimationFrame(loop);
+      })();
+    }
+    function stopConfetti(){ confettiLoopRunning = false; }
+
+    // ---------- Party popper burst (DOM) ----------
+    const popperColors = ['#FF6B6B','#FFD166','#6CE7B8','#78D5FF','#C2B3FF','#FF8AC2','#FFFFFF'];
+    function createPartyBurst(x,y,count=18){
+      for (let i=0;i<count;i++){
+        const p = document.createElement('div'); p.className = 'particle'; p.style.background = popperColors[Math.floor(Math.random()*popperColors.length)];
+        document.body.appendChild(p);
+        const angle = Math.random()*Math.PI*2; const speed = 2 + Math.random()*6;
+        const vx = Math.cos(angle)*speed, vy = Math.sin(angle)*speed;
+        p.style.left = x + 'px'; p.style.top = y + 'px'; p.style.width = (4 + Math.random()*10) + 'px'; p.style.height = (4 + Math.random()*10) + 'px';
+        p.animate([{ transform:'translate(0,0) scale(1)', opacity:1 }, { transform:`translate(${vx*28}px, ${vy*28}px) scale(.6)`, opacity:0 }], { duration: 900 + Math.random()*700, easing:'cubic-bezier(.2,.9,.2,1)' });
+        setTimeout(()=>{ try{ p.remove(); }catch(e){} }, 1700);
+      }
+    }
+
+    // ---------- Slideshow ----------
+    let slideIndex = 0;
+    function showSlide(index){
+      slideIndex = (index % preloaded.length + preloaded.length) % preloaded.length;
+      imgEl.src = preloaded[slideIndex].src;
+    }
+    function nextSlide(){ showSlide(slideIndex + 1); }
+    function prevSlide(){ showSlide(slideIndex - 1); }
+
+    slideToggleBtn.addEventListener('click', () => { if (slideshowRunning) stopSlideshow(); else startSlideshow(); });
+    nextBtn.addEventListener('click', nextSlide);
+    prevBtn.addEventListener('click', prevSlide);
+
+    function startSlideshow(){
+      if (slideshowRunning) return;
+      slideshowRunning = true; slideToggleBtn.textContent = 'Stop Slide Show'; showSlide(0);
+      slideInterval = setInterval(nextSlide, 2500);
+    }
+    function stopSlideshow(){
+      slideshowRunning = false; slideToggleBtn.textContent = 'Begin Slide Show';
+      if (slideInterval){ clearInterval(slideInterval); slideInterval = null; }
+    }
+
+    // ---------- Main sequence ----------
+    okBtn.addEventListener('click', () => {
+      modal.style.display = 'none';
+      document.body.classList.add('party');
+      floatingHeader.classList.add('show');
+      startBalloonSpawner();
+      startConfetti();
+      // user controls music; do not autoplay audio to respect browser policies
+    });
+
+    // instrument interaction
+    instrumentSvg.addEventListener('click', () => {
+      createPartyBurst(window.innerWidth/2, window.innerHeight/2, 28);
+      instrumentSvg.animate([{ transform:'scale(1)' }, { transform:'scale(1.06)' }, { transform:'scale(1)' }], { duration:420, easing:'cubic-bezier(.2,.9,.2,1)' });
+    });
+
+    // close modal on ESC or click outside
+    window.addEventListener('keydown', e => { if (e.key === 'Escape') modal.style.display='none'; });
+    modal.addEventListener('click', ev => { if (ev.target === modal) modal.style.display='none'; });
+
+    // cleanup on unload
+    window.addEventListener('beforeunload', () => { stopConfetti(); stopBalloonSpawner(); stopSlideshow(); stopMusicLoop(); try{ audioCtx && audioCtx.close && audioCtx.close(); }catch(e){} });
+
+    // initialize
+    showSlide(0);
+  </script>
+</body>
+</html>
